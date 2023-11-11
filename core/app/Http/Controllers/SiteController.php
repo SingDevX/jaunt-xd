@@ -43,7 +43,7 @@ class SiteController extends Controller
         info($user);
         //pass user to helper function
         //create helper that will recommend a property
-
+        //create html here to pass
         $testHtmlContent = 'This is htmlaskdjlklasdjaskldasdkljhaskdjajkshd';
 
         $pageTitle = 'Home';
