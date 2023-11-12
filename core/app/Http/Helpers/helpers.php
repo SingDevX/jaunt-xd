@@ -8,14 +8,45 @@ use App\Models\Frontend;
 use App\Models\GeneralSetting;
 use App\Models\SmsTemplate;
 use App\Models\EmailLog;
+use App\Models\User;
+use App\Models\Property;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Mail;
 use PHPMailer\PHPMailer\Exception;
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\SMTP;
 //
-function getRecommendations(){
+function getRecommendations($userInfo){
+    if($userInfo == null) {//means no user is logged in
+        return null;
+    }
+    $user = User::find($userInfo->id);
 
+    if ($user) {
+        $hasDemographics = $user->demographics()->exists();
+    
+        if ($hasDemographics) {
+            $demographics = $user->demographics;
+            info($demographics);
+            info($demographics->income);
+            info($demographics->family_size);
+            info($demographics->gender);
+            // User with user_id 1 has demographics data.
+            // You can perform actions or assertions here.
+        } else {
+            // User with user_id 1 does not have demographics data.
+            info('user has no demograpics');
+        }
+    } else {
+        // User with user_id 1 does not exist.
+    }
+
+
+    // Property::where('description', 'description')->get();
+    $recommendedProperties = Property::all();
+    info($recommendedProperties);
+    $test = 'test';
+    return $test;
 }
 
 function sidebarVariation(){

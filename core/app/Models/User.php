@@ -43,6 +43,10 @@ class User extends Authenticatable
     ];
 
 
+    public function demographics()
+    {
+        return $this->hasOne(Demographics::class);
+    }
 
 
     public function login_logs()

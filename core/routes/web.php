@@ -553,3 +553,5 @@ Route::get('/{slug}', 'SiteController@pages')->name('pages');
 Route::get('/', 'SiteController@index')->name('home');
 
 Route::get('/additional_content','RecommController@getAdditionalContent');
+
+Route::post('/demographics', 'DemographicsController@store')->name('demographics.store');

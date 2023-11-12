@@ -8,6 +8,7 @@ use App\Models\Property;
 use App\Models\BookedProperty;
 use App\Models\Review;
 use App\Models\SupportTicket;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -31,8 +32,10 @@ class UserController extends Controller
                 $bookedProperty->where('user_id', Auth::id())->where('status', 1);
             })->whereDoesntHave('review')->count();
         $propertyBookings = BookedProperty::with('property', 'bookedRooms.room')->where('user_id', Auth::id())->orderBy('id', 'DESC')->limit(6)->get();
+        $user = User::find(Auth::id());
+        $demographics = $user->demographics;
 
-        return view($this->activeTemplate . 'user.dashboard', compact('pageTitle', 'emptyMessage', 'propertyBookings', 'widget'));
+        return view($this->activeTemplate . 'user.dashboard', compact('pageTitle', 'emptyMessage', 'propertyBookings', 'widget', 'demographics'));//demographics status here
     }
 
     public function profile()

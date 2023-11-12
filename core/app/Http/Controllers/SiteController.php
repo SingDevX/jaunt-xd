@@ -9,6 +9,7 @@ use App\Models\Page;
 use App\Models\Subscriber;
 use App\Models\SupportMessage;
 use App\Models\SupportTicket;
+use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -40,11 +41,13 @@ class SiteController extends Controller
 
         //get user
         $user = auth()->user();
-        info($user);
+        
         //pass user to helper function
+
         //create helper that will recommend a property
-        //create html here to pass
-        $testHtmlContent = 'This is htmlaskdjlklasdjaskldasdkljhaskdjajkshd';
+        
+        //create html here to pass to home.blade.php
+        $testHtmlContent = getRecommendations($user);//if null dont create html
 
         $pageTitle = 'Home';
         $sections = Page::where('tempname',$this->activeTemplate)->where('slug','home')->first();

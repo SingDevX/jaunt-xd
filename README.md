@@ -10,3 +10,18 @@ app>Http>Controllers>SiteController -- recommendations process
 
 how find which controller is called in a route
     go to laravel debug bar > Route
+
+
+Todo:
+created Demographics model - done
+created form for inserting demographics - done
+created route to insert demographics - done
+
+create recommendation function
+if there is logged in user display recommendations in home
+    if demographics exist
+        display recommendation
+    else 
+        display prompt to go to dashboard then input demographics
+else 
+    dont display

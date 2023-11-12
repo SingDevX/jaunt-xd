@@ -4,10 +4,12 @@
     $banner = getContent('banner.content', true);//this is a helper function //goto app/Http/Helpers
     
 @endphp
-<!-- hero section start -->
-{{-- @include($activeTemplate.'sections.recommendation') --}}
-<p>{{$customVariable}}</p>
-<br />
+
+{{-- SiteController will pass an object($recommendedProperties) here 
+    then write @foreach ($recommendedProperties as $recommendedProperty)
+    $recommendedProperty->img
+    $$recommendedProperty->text --}}
+{{-- <p>{{$customVariable}}</p> --}}
 <section class="hero bg_img" style="background-image: url('{{ getImage('assets/images/frontend/banner/'.$banner->data_values->background_image, '1920x1195') }}');">
     <div class="container">
         <div class="row justify-content-center">
