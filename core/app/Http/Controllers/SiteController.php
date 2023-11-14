@@ -47,12 +47,12 @@ class SiteController extends Controller
         //create helper that will recommend a property
         
         //create html here to pass to home.blade.php
-        $testHtmlContent = getRecommendations($user);//if null dont create html
-
+        $recommendedProperties = getRecommendations($user);//if null dont create html
+        info($recommendedProperties);
         $pageTitle = 'Home';
         $sections = Page::where('tempname',$this->activeTemplate)->where('slug','home')->first();
         $locations = Location::where('status', 1)->limit(10)->get();
-        return view($this->activeTemplate . 'home', compact('pageTitle','sections', 'locations'))->with('customVariable', $testHtmlContent);
+        return view($this->activeTemplate . 'home', compact('pageTitle','sections', 'locations', 'recommendedProperties'));
     }
     public function locations(){
         $pageTitle = 'All Locations';

@@ -17,6 +17,64 @@ use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\SMTP;
 //
 function getRecommendations($userInfo){
+    function calculateTransientHouseScores($demographics, $userPreferences, $transientHouses) {
+        $incomeWeight = 0.3;
+        $familySizeWeight = 0.2;
+        $genderWeight = 0.1;
+    
+        //ewan? read README.md
+        $preferenceScores = [
+            "secret" => 0.2,
+            "transient" => 0.1,
+            "Beach" => 0.3,
+            "Boat" => 0.2,
+            "Island Hopping" => 0.2,
+            "Cliff Diving" => 0.1,
+            "Fish Feeding" => 0.2,
+            "Parking" => 0.1
+        ];
+    
+        $scores = [];
+    
+        foreach ($transientHouses as $transientHouseFeatures) {
+            $income = $demographics['income'];
+            $incomeWeightByRange = 0.0;
+
+            if ($income >= 0 && $income <= 20000) {
+                $incomeWeightByRange = 0.1;
+            } elseif ($income >= 20001 && $income <= 30000) {
+                $incomeWeightByRange = 0.2;
+            } elseif ($income >= 30001 && $income <= 40000) {
+                $incomeWeightByRange = 0.3;
+            } elseif ($income >= 40001 && $income <= 50000) {
+                $incomeWeightByRange = 0.4;
+            } else {
+                $incomeWeightByRange = 0.5;
+            }
+
+            // Calculate the weighted sum of demographic factors for each transient house
+            $demographicScore = (
+                $incomeWeight * $incomeWeightByRange +
+                $familySizeWeight * $demographics['familySize']
+                // $genderWeight * ($demographics['gender'] === 'female' ? 1 : 0)
+            );
+    
+            // Calculate the total score based on preferences for each transient house
+            $totalScore = array_sum(array_map(function ($userPreferences) use ($preferenceScores) {
+                return $preferenceScores[$userPreferences] ?? 0;
+            }, $transientHouseFeatures));
+    
+            // Combine demographic and preference scores for each transient house
+            $recommendationScore = 0.2 * $demographicScore + 0.8 * $totalScore;
+    
+            // Store the recommendation score for each transient house
+            $scores[] = $recommendationScore;
+        }
+    
+        return $scores;
+    }    
+
+    $userDemographics = null;
     if($userInfo == null) {//means no user is logged in
         return null;
     }
@@ -26,11 +84,11 @@ function getRecommendations($userInfo){
         $hasDemographics = $user->demographics()->exists();
     
         if ($hasDemographics) {
-            $demographics = $user->demographics;
-            info($demographics);
-            info($demographics->income);
-            info($demographics->family_size);
-            info($demographics->gender);
+            $userDemographics = $user->demographics;
+            info($userDemographics);
+            info($userDemographics->income);
+            info($userDemographics->family_size);
+            info($userDemographics->gender);
             // User with user_id 1 has demographics data.
             // You can perform actions or assertions here.
         } else {
@@ -42,11 +100,29 @@ function getRecommendations($userInfo){
     }
 
 
-    // Property::where('description', 'description')->get();
-    $recommendedProperties = Property::all();
+    $userPreferences = ["Beach", "Island Hopping", "Fish Feeding"];
+    
+    $transientHousesId = Property::all()->pluck('id');
+    $transientHousesAmenities = Property::whereIn('id', $transientHousesId)->pluck('extra_features');
+
+    $scores = calculateTransientHouseScores($userDemographics, $userPreferences, $transientHousesAmenities);
+
+    $sortedScores = array_combine($transientHousesId->toArray(), $scores);
+    arsort($sortedScores);
+    $topTwoProperties = array_slice($sortedScores, 0, 2, true);
+    $topTwoPropertiesIds = array_keys($topTwoProperties);
+
+    info($topTwoPropertiesIds);
+    $recommendedProperties = Property::with('location', 'rooms')
+        ->whereIn('id', $topTwoPropertiesIds)
+        ->orderBy('all_time_booked_counter', 'DESC')
+        ->get();
     info($recommendedProperties);
-    $test = 'test';
-    return $test;
+
+    // for ($i = 0; $i < count($transientHousesAmenities); $i++) {
+    //     info("Transient House " . ($transientHousesId[$i]) . " Score: {$scores[$i]}\n");
+    // }
+    return $recommendedProperties;
 }
 
 function sidebarVariation(){
