@@ -48,6 +48,10 @@ class User extends Authenticatable
         return $this->hasOne(Demographics::class);
     }
 
+    public function preferences()
+    {
+        return $this->hasOne(Preference::class);
+    }
 
     public function login_logs()
     {

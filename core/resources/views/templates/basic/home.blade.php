@@ -2,14 +2,112 @@
 @section('content')
 @php
     $banner = getContent('banner.content', true);//this is a helper function //goto app/Http/Helpers
-    
 @endphp
+@push('style')
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.1/css/bootstrap-select.css" />
+<style>
+    .dropdown-toggle{
+        height: 40px;
+        width: 400px !important;
+    }
+</style>
+@endpush
+@if (!$hasDemographics)
+    <div class="row gy-4">
+        <form action="{{ route('demographics.store') }}" method="POST">
+            @csrf
+            <div class="form-group">
+                <label for="income">Income:</label>
+                <input type="number" name="income" id="income" class="form-control" required>
+            </div>
+        
+            <div class="form-group">
+                <label for="family_size">Family Size:</label>
+                <input type="number" name="family_size" id="family_size" class="form-control" required>
+            </div>
+        
+            <div class="form-group">
+                <label for="gender">Gender:</label>
+                <select name="gender" id="gender" class="form-control" required>
+                    <option value="Male">Male</option>
+                    <option value="Female">Female</option>
+                    <option value="Other">Other</option>
+                </select>
+            </div>
+        
+            <button type="submit" class="btn btn-primary">Submit</button>
+        </form>
+    </div>
+@endif
 
-{{-- SiteController will pass an array of objects($recommendedProperties) here 
-    then write @foreach ($recommendedProperties as $recommendedProperty)
-    $recommendedProperty->img
-    $$recommendedProperty->text --}}
+@if (!$hasPreferences)
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header" style="background: gray; color:#f1f7fa; font-weight:bold;">
+                    Select 3 Categories
+                </div>
+                    <div class="card-body">
+                    @php
+                        $preferences = [
+                            'Hot Spring',
+                            'Fish Feeding',
+                            'Beach',
+                            'Parking',
+                            'Island Hopping',
+                            'Forest',
+                            'Boat'
+                        ];
+                    @endphp                    
+                    <form id="preferencesForm" class="w-px-500 p-3 p-md-3" action="{{ route('preferences.store') }}" method="post">
+                        @csrf
+                        <div class="row mb-3">
+                            <label class="col-sm-3 col-form-label">Preferences</label>
+                            <div class="col-sm-9 mt-3">
+                                <select name="preferences[]" id="preferences" multiple required>
+                                    @foreach ($preferences as $item)
+                                        <option value="{{ $item }}">
+                                            {{ $item }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <label class="col-sm-3 col-form-label"></label>
+                            <div class="col-sm-9">
+                                <button type="submit" class="btn btn-success text-white">Submit</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@push('script')
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.1/js/bootstrap-select.min.js"></script>
+    <script>
+        $('select').selectpicker();
+    </script>
+@endpush
+@endif
 
+@if(session('demographics-success'))
+    <div class="alert alert-success">
+        {{ session('demographics-success') }}
+    </div>
+@endif
+
+@if(session('preferences-success'))
+    <div class="alert alert-success">
+        {{ session('preferences-success') }}
+    </div>
+@endif
 
 @if ($recommendedProperties)
     <div class="best-trip-slider">
@@ -60,17 +158,7 @@
         </div><!-- single-slide end -->
         @endforeach
     </div>
-@else
-    <p>xd is null or empty.</p>
 @endif
-
-
-
-{{-- @forelse($recommendedProperties as $recommendedProperty)
-    {{ $recommendedProperty }}
-@empty
-    <p>No items found.</p>
-@endforelse --}}
 
 <section class="hero bg_img" style="background-image: url('{{ getImage('assets/images/frontend/banner/'.$banner->data_values->background_image, '1920x1195') }}');">
     <div class="container">

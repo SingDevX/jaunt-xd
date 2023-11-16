@@ -16,7 +16,7 @@ use PHPMailer\PHPMailer\Exception;
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\SMTP;
 //
-function getRecommendations($userInfo){
+function getRecommendations($userDemographics, $userPreferences){
     function calculatePropertyRoomSizeAverages($property){
         $roomsForProperty = $property->rooms;
 
@@ -56,7 +56,7 @@ function getRecommendations($userInfo){
         return array_keys($topTwoProperties);
     }
 
-    function calculateTransientHouseScores($demographics, $userPreferences, $transientHousesData) {
+    function calculateTransientHouseScores($demographics, $preferences, $transientHousesData) {
         $incomeWeight = 0.3;
         $familySizeWeight = 0.2;
     
@@ -103,7 +103,7 @@ function getRecommendations($userInfo){
 
             foreach ($transientHouseFeatures as $feature) {
                 // Check if the feature exists in userPreferences
-                if (in_array($feature, $userPreferences)) {
+                if (in_array($feature, $preferences)) {
                     // If it exists, add a score based on $preferenceWeight
                     $scoreForPreferences += $preferenceWeight[$feature] ?? 0;
                 }
@@ -117,29 +117,6 @@ function getRecommendations($userInfo){
     
         return $scores;
     }    
-
-    $userDemographics = null;
-    $userPreferences = null;
-    if($userInfo == null) {//means no user is logged in
-        return null;
-    }
-    $user = User::find($userInfo->id);
-
-    if ($user) {
-        $hasDemographics = $user->demographics()->exists();
-    
-        if ($hasDemographics) {
-            $userDemographics = $user->demographics;
-            $userPreferences = ["Hot Spring", "Parking", "Fish Feeding"];
-            // info($userDemographics);
-        } else {
-
-            // User with user_id 1 does not have demographics data.
-            info('user has no demograpics');
-        }
-    } else {
-        // User with user_id 1 does not exist.
-    }
     
     $transientHousesId = Property::all()->pluck('id');
 
@@ -151,13 +128,12 @@ function getRecommendations($userInfo){
     $scores = calculateTransientHouseScores($userDemographics, $userPreferences, $transientHousesData);
 
     $topTwoPropertiesIds = getTopProperties($transientHousesId->toArray(), $scores);
-    info($topTwoPropertiesIds);
 
     $recommendedProperties = Property::with('location', 'rooms')
         ->whereIn('id', $topTwoPropertiesIds)
         ->orderBy('all_time_booked_counter', 'DESC')
         ->get();
-    // info($recommendedProperties);
+
     return $recommendedProperties;
 }
 

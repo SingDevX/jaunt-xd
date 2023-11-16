@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Demographics extends Model
 {
-    protected $fillable = ['user_id', 'income', 'family_size', 'gender'];
+    protected $fillable = ['user_id', 'income', 'family_size'];
 
     public function user()
     {

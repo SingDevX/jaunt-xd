@@ -32,10 +32,8 @@ class UserController extends Controller
                 $bookedProperty->where('user_id', Auth::id())->where('status', 1);
             })->whereDoesntHave('review')->count();
         $propertyBookings = BookedProperty::with('property', 'bookedRooms.room')->where('user_id', Auth::id())->orderBy('id', 'DESC')->limit(6)->get();
-        $user = User::find(Auth::id());
-        $demographics = $user->demographics;
 
-        return view($this->activeTemplate . 'user.dashboard', compact('pageTitle', 'emptyMessage', 'propertyBookings', 'widget', 'demographics'));//demographics status here
+        return view($this->activeTemplate . 'user.dashboard', compact('pageTitle', 'emptyMessage', 'propertyBookings', 'widget'));
     }
 
     public function profile()

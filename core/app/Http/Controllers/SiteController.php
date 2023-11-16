@@ -41,18 +41,34 @@ class SiteController extends Controller
 
         //get user
         $user = auth()->user();
-        
-        //pass user to helper function
 
-        //create helper that will recommend a property
-        
-        //create html here to pass to home.blade.php
-        $recommendedProperties = getRecommendations($user);//if null dont create html
+        $userFound = User::find($user->id);
+
+        $recommendedProperties = null;
+        $demographics = null;
+        $hasDemographics = null;
+        $preferences = null;
+        $hasPreferences = null;
+
+        if ($userFound) {
+            $hasDemographics = $userFound->demographics()->exists();
+            $hasPreferences = $userFound->preferences()->exists();
+
+            if ($hasDemographics) {
+                $demographics = $userFound->demographics;
+            }
+            if ($hasPreferences) {
+                $preferences = json_decode($userFound->preferences['values']);
+            }
+            if($hasDemographics && $hasPreferences){
+                $recommendedProperties = getRecommendations($demographics, $preferences);
+            }
+        }
 
         $pageTitle = 'Home';
         $sections = Page::where('tempname',$this->activeTemplate)->where('slug','home')->first();
         $locations = Location::where('status', 1)->limit(10)->get();
-        return view($this->activeTemplate . 'home', compact('pageTitle','sections', 'locations', 'recommendedProperties'));
+        return view($this->activeTemplate . 'home', compact('pageTitle','sections', 'locations', 'recommendedProperties', 'hasDemographics', 'hasPreferences'));
     }
     public function locations(){
         $pageTitle = 'All Locations';

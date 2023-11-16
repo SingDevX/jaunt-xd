@@ -17,9 +17,8 @@ class DemographicsController extends Controller
     
         $user = User::find(auth()->user()->id);
     
-        // Create a new Demographics record for the current user
         $user->demographics()->create($validatedData);
 
-        return redirect('/user/dashboard');
+        return redirect()->route('home')->with('demographics-success', 'Additional information saved successfully!');;
     }
 }

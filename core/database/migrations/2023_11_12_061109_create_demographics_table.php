@@ -19,7 +19,6 @@ class CreateDemographicsTable extends Migration
             $table->foreign('user_id')->references('id')->on('users');
             $table->decimal('income', 10, 2);
             $table->integer('family_size');
-            $table->string('gender');
             $table->timestamps();
         });
     }

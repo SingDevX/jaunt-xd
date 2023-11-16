@@ -1,36 +1,6 @@
 @extends($activeTemplate.'layouts.master')
 @section('content')
     <div class="row gy-4">
-        {{-- Create demographics form here --}}
-        @if(!$demographics)
-            <form action="{{ route('demographics.store') }}" method="POST">
-                @csrf
-            
-                <!-- Insert the fields for demographics data -->
-                <div class="form-group">
-                    <label for="income">Income:</label>
-                    <input type="number" name="income" id="income" class="form-control" required>
-                </div>
-            
-                <div class="form-group">
-                    <label for="family_size">Family Size:</label>
-                    <input type="number" name="family_size" id="family_size" class="form-control" required>
-                </div>
-            
-                <div class="form-group">
-                    <label for="gender">Gender:</label>
-                    <select name="gender" id="gender" class="form-control" required>
-                        <option value="Male">Male</option>
-                        <option value="Female">Female</option>
-                        <option value="Other">Other</option>
-                    </select>
-                </div>
-            
-                <button type="submit" class="btn btn-primary">Submit</button>
-            </form>
-        @endif        
-    </div><!-- row end -->
-    <div class="row gy-4">
         <div class="col-md-4 col-sm-6">
             <a href="{{ route('ticket') }}" class="d-widget">
                 <div class="d-widget__icon">
