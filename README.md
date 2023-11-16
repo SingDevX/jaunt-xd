@@ -19,7 +19,7 @@ created route to insert demographics - done
 
 create recommendation function - done
 
-if there is logged in user display recommendations in home
+if there is logged in user display recommendations in home - done
     if demographics and preferences exist
         display recommendation
     else 
