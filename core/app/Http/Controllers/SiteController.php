@@ -48,7 +48,7 @@ class SiteController extends Controller
         
         //create html here to pass to home.blade.php
         $recommendedProperties = getRecommendations($user);//if null dont create html
-        info($recommendedProperties);
+
         $pageTitle = 'Home';
         $sections = Page::where('tempname',$this->activeTemplate)->where('slug','home')->first();
         $locations = Location::where('status', 1)->limit(10)->get();

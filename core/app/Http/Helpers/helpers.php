@@ -17,13 +17,50 @@ use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\SMTP;
 //
 function getRecommendations($userInfo){
-    function calculateTransientHouseScores($demographics, $userPreferences, $transientHouses) {
+    function calculatePropertyRoomSizeAverages($property){
+        $roomsForProperty = $property->rooms;
+
+        $totalAdults = 0;
+        $totalChildren = 0;
+
+        foreach ($roomsForProperty as $room) {
+            $totalAdults += $room->adult;
+            $totalChildren += $room->child;
+        }
+
+        $roomCount = count($roomsForProperty);
+
+        // Calculate averages
+        $averageSize = $roomCount > 0 ? ($totalAdults + $totalChildren) / $roomCount : 0;
+
+        // Return the results
+        return [
+            'averageSize' => $averageSize,
+        ];
+    }
+
+    function calculateScore($userValue, $averageValue, $weight){
+        if ($averageValue == 0) {
+            return 0;
+        }
+
+        // Calculate the score based on the user's value, average value, and weight
+        $difference = abs($userValue - $averageValue);
+        return max(0, 1 - $difference / $averageValue) * $weight;
+    }
+
+    function getTopProperties($transientHousesId, $scores) {
+        $sortedScores = array_combine($transientHousesId, $scores);
+        arsort($sortedScores);
+        $topTwoProperties = array_slice($sortedScores, 0, 2, true);
+        return array_keys($topTwoProperties);
+    }
+
+    function calculateTransientHouseScores($demographics, $userPreferences, $transientHousesData) {
         $incomeWeight = 0.3;
         $familySizeWeight = 0.2;
-        $genderWeight = 0.1;
     
-        //ewan? read README.md
-        $preferenceScores = [
+        $preferenceWeight = [
             "secret" => 0.2,
             "transient" => 0.1,
             "Beach" => 0.3,
@@ -33,41 +70,48 @@ function getRecommendations($userInfo){
             "Fish Feeding" => 0.2,
             "Parking" => 0.1
         ];
+
+        // Define income ranges based on property star rating
+        $incomeRanges = [
+            1 => [0, 20000],
+            2 => [20001, 30000],
+            3 => [30001, 40000],
+            4 => [40001, 50000],
+            5 => [50001, PHP_INT_MAX],
+        ];
     
         $scores = [];
     
-        foreach ($transientHouses as $transientHouseFeatures) {
-            $income = $demographics['income'];
-            $incomeWeightByRange = 0.0;
+        foreach ($transientHousesData as $transientHouse) {
+        //Rooms
+            $transientHouseRoomAverages = calculatePropertyRoomSizeAverages($transientHouse);
 
-            if ($income >= 0 && $income <= 20000) {
-                $incomeWeightByRange = 0.1;
-            } elseif ($income >= 20001 && $income <= 30000) {
-                $incomeWeightByRange = 0.2;
-            } elseif ($income >= 30001 && $income <= 40000) {
-                $incomeWeightByRange = 0.3;
-            } elseif ($income >= 40001 && $income <= 50000) {
-                $incomeWeightByRange = 0.4;
-            } else {
-                $incomeWeightByRange = 0.5;
+            // Calculate family size score
+            $averageSize = $transientHouseRoomAverages['averageSize'];
+            $familySizeScore = calculateScore($demographics->family_size, $averageSize, $familySizeWeight);
+
+            // Calculate income score
+            $recommendedIncomeRange = $incomeRanges[$transientHouse->star] ?? [0, PHP_INT_MAX];
+            $incomeScore = calculateScore($demographics->income, $recommendedIncomeRange[0], $incomeWeight);
+
+            $scoreForDemographics = $incomeScore + $familySizeScore;
+
+        //Features
+            $transientHouseFeatures = $transientHouse->extra_features;
+            
+            $scoreForPreferences = 0;
+
+            foreach ($transientHouseFeatures as $feature) {
+                // Check if the feature exists in userPreferences
+                if (in_array($feature, $userPreferences)) {
+                    // If it exists, add a score based on $preferenceWeight
+                    $scoreForPreferences += $preferenceWeight[$feature] ?? 0;
+                }
             }
 
-            // Calculate the weighted sum of demographic factors for each transient house
-            $demographicScore = (
-                $incomeWeight * $incomeWeightByRange +
-                $familySizeWeight * $demographics['familySize']
-                // $genderWeight * ($demographics['gender'] === 'female' ? 1 : 0)
-            );
+            //Calculate Total Score
+            $recommendationScore = 0.2 * $scoreForDemographics + 0.8 * $scoreForPreferences;
     
-            // Calculate the total score based on preferences for each transient house
-            $totalScore = array_sum(array_map(function ($userPreferences) use ($preferenceScores) {
-                return $preferenceScores[$userPreferences] ?? 0;
-            }, $transientHouseFeatures));
-    
-            // Combine demographic and preference scores for each transient house
-            $recommendationScore = 0.2 * $demographicScore + 0.8 * $totalScore;
-    
-            // Store the recommendation score for each transient house
             $scores[] = $recommendationScore;
         }
     
@@ -75,6 +119,7 @@ function getRecommendations($userInfo){
     }    
 
     $userDemographics = null;
+    $userPreferences = null;
     if($userInfo == null) {//means no user is logged in
         return null;
     }
@@ -85,43 +130,34 @@ function getRecommendations($userInfo){
     
         if ($hasDemographics) {
             $userDemographics = $user->demographics;
-            info($userDemographics);
-            info($userDemographics->income);
-            info($userDemographics->family_size);
-            info($userDemographics->gender);
-            // User with user_id 1 has demographics data.
-            // You can perform actions or assertions here.
+            $userPreferences = ["Hot Spring", "Parking", "Fish Feeding"];
+            // info($userDemographics);
         } else {
+
             // User with user_id 1 does not have demographics data.
             info('user has no demograpics');
         }
     } else {
         // User with user_id 1 does not exist.
     }
-
-
-    $userPreferences = ["Beach", "Island Hopping", "Fish Feeding"];
     
     $transientHousesId = Property::all()->pluck('id');
-    $transientHousesAmenities = Property::whereIn('id', $transientHousesId)->pluck('extra_features');
 
-    $scores = calculateTransientHouseScores($userDemographics, $userPreferences, $transientHousesAmenities);
+    $transientHousesData = Property::select('id', 'extra_features', 'star')
+        ->with('rooms')
+        ->whereIn('id', $transientHousesId)
+        ->get();
 
-    $sortedScores = array_combine($transientHousesId->toArray(), $scores);
-    arsort($sortedScores);
-    $topTwoProperties = array_slice($sortedScores, 0, 2, true);
-    $topTwoPropertiesIds = array_keys($topTwoProperties);
+    $scores = calculateTransientHouseScores($userDemographics, $userPreferences, $transientHousesData);
 
+    $topTwoPropertiesIds = getTopProperties($transientHousesId->toArray(), $scores);
     info($topTwoPropertiesIds);
+
     $recommendedProperties = Property::with('location', 'rooms')
         ->whereIn('id', $topTwoPropertiesIds)
         ->orderBy('all_time_booked_counter', 'DESC')
         ->get();
-    info($recommendedProperties);
-
-    // for ($i = 0; $i < count($transientHousesAmenities); $i++) {
-    //     info("Transient House " . ($transientHousesId[$i]) . " Score: {$scores[$i]}\n");
-    // }
+    // info($recommendedProperties);
     return $recommendedProperties;
 }
 

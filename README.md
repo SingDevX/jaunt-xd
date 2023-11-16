@@ -17,14 +17,22 @@ created Demographics model - done
 created form for inserting demographics - done
 created route to insert demographics - done
 
-create recommendation function
+create recommendation function - done
+
 if there is logged in user display recommendations in home
-    if demographics exist
+    if demographics and preferences exist
         display recommendation
     else 
         display prompt to go to dashboard then input demographics
+        //or 
 else 
     dont display
+
+/////////////////////////If this error shows
+ErrorException
+Undefined array key 0 (View: C:\xampp\htdocs\JauntSystem\core\resources\views\templates\basic\home.blade.php)
+
+It means there is no room for that property
 
 
 
