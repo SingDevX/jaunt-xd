@@ -17,6 +17,7 @@ use App\Rules\FileTypeValidate;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use stdClass;
 
 class PaymentController extends Controller
 {
@@ -57,18 +58,24 @@ class PaymentController extends Controller
         $bookedProperty = $checkOutData['booked_property'];
 
         $user = auth()->user();
-        $gate = GatewayCurrency::whereHas('method', function ($gate) {
-            $gate->where('status', 1);
-        })->where('method_code', $request->method_code)->where('currency', $request->currency)->first();
-        if (!$gate) {
-            $notify[] = ['error', 'Invalid gateway'];
-            return back()->withNotify($notify);
-        }
+        $gate = new stdClass();
+        $gate->percent_charge = 1;
+        $gate->fixed_charge = 1;
+        $gate->method_code = 1;
+        $gate->rate = 1;
+        $gate->currency = 'xd';
+        // $gate = GatewayCurrency::whereHas('method', function ($gate) {
+        //     $gate->where('status', 1);
+        // })->where('method_code', $request->method_code)->where('currency', $request->currency)->first();
+        // if (!$gate) {
+        //     $notify[] = ['error', 'Invalid gateway'];
+        //     return back()->withNotify($notify);
+        // }
 
-        if ($gate->min_amount > $amount || $gate->max_amount < $amount) {
-            $notify[] = ['error', 'Please follow deposit limit'];
-            return back()->withNotify($notify);
-        }
+        // if ($gate->min_amount > $amount || $gate->max_amount < $amount) {
+        //     $notify[] = ['error', 'Please follow deposit limit'];
+        //     return back()->withNotify($notify);
+        // }
 
         $charge = $gate->fixed_charge + ($amount * $gate->percent_charge / 100);
         $payable = $amount + $charge;
@@ -107,16 +114,17 @@ class PaymentController extends Controller
     public function depositConfirm()
     {
         $track = session()->get('Track');
+        info($track);
         $deposit = Deposit::where('trx', $track)->where('status',0)->orderBy('id', 'DESC')->with('gateway')->firstOrFail();
 
-        if ($deposit->method_code >= 1000) {
+        if (true) {
             $this->userDataUpdate($deposit);
             $notify[] = ['success', 'Your deposit request is queued for approval.'];
-            return back()->withNotify($notify);
+            return redirect()->route('user.home')->withNotify($notify);
         }
 
 
-        $dirName = $deposit->gateway->alias;
+        $dirName = 'Shrek';
         $new = __NAMESPACE__ . '\\' . $dirName . '\\ProcessController';
 
         $data = $new::process($deposit);
@@ -145,7 +153,8 @@ class PaymentController extends Controller
     public static function userDataUpdate($trx)
     {
         $general = GeneralSetting::first();
-        $data = Deposit::where('trx', $trx)->first();
+        $data = Deposit::where('trx', $trx->trx)->first();
+        info($data);
         if ($data->status == 0) {
             $data->status = 1;
             $data->save();
@@ -174,19 +183,19 @@ class PaymentController extends Controller
             $transaction->post_balance = $owner->balance;
             $transaction->charge = $data->charge;
             $transaction->trx_type = '+';
-            $transaction->details = 'Property Booking Payment Via ' . $data->gatewayCurrency()->name;
+            $transaction->details = 'Property Booking Payment Via ' . $data->method_currency;
             $transaction->trx = $data->trx;
             $transaction->save();
 
             $adminNotification = new AdminNotification();
             $adminNotification->user_id = $user->id;
-            $adminNotification->title = 'Payment successful via '.$data->gatewayCurrency()->name;
+            $adminNotification->title = 'Payment successful via '.$data->method_currency;
             $adminNotification->click_url = urlPath('admin.deposit.successful');
             $adminNotification->save();
 
 
             notify($user, 'DEPOSIT_COMPLETE', [
-                'method_name' => $data->gatewayCurrency()->name,
+                'method_name' => $data->method_currency,
                 'method_currency' => $data->method_currency,
                 'method_amount' => showAmount($data->final_amo),
                 'amount' => showAmount($data->amount),
@@ -207,7 +216,7 @@ class PaymentController extends Controller
                 'currency' => $general->cur_text,
                 'total_room' => $bookedProperty->bookedRooms->count(),
                 'post_balance' => showAmount($owner->balance),
-                'method_name' => $data->gatewayCurrency()->name,
+                'method_name' => $data->method_currency,
                 'method_currency' => $data->method_currency,
             ], 'owner');
 

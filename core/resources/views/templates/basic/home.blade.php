@@ -13,7 +13,8 @@
     }
 </style>
 @endpush
-@if (!$hasDemographics)
+@if(auth()->user())
+    @if (!$hasDemographics)
     <div class="row gy-4">
         <form action="{{ route('demographics.store') }}" method="POST">
             @csrf
@@ -39,10 +40,10 @@
             <button type="submit" class="btn btn-primary">Submit</button>
         </form>
     </div>
-@endif
+    @endif
 
-@if (!$hasPreferences)
-<div class="container">
+    @if (!$hasPreferences)
+    <div class="container">
     <div class="row justify-content-center">
         <div class="col-md-8">
             <div class="card">
@@ -86,15 +87,16 @@
             </div>
         </div>
     </div>
-</div>
-@push('script')
+    </div>
+    @push('script')
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.1/js/bootstrap-select.min.js"></script>
     <script>
         $('select').selectpicker();
     </script>
-@endpush
+    @endpush
+    @endif
 @endif
 
 @if(session('demographics-success'))

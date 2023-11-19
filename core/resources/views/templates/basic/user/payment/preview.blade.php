@@ -8,35 +8,35 @@
                     <div class="card-body card-body-deposit">
                         <ul class="list-group text-center">
                             <li class="list-group-item img_list pb-4">
-                                <img src="{{ $data->gatewayCurrency()->methodImage() }}" alt="@lang('Image')" class="w-50" />
+                                <img src="{{ 'https://i.seadn.io/gae/2hDpuTi-0AMKvoZJGd-yKWvK4tKdQr_kLIpB_qSeMau2TNGCNidAosMEvrEXFO9G6tmlFlPQplpwiqirgrIPWnCKMvElaYgI-HiVvXc?auto=format&dpr=1&w=1000' }}" alt="@lang('Image')" class="w-50" />
                             </li>
                             <p class="list-group-item d-flex justify-content-between">
                                 @lang('Amount'):
-                                <strong>{{showAmount($data->amount)}} {{__($general->cur_text)}}</strong>
+                                <strong>{{1}} {{__('xd')}}</strong>
                             </p>
                             <p class="list-group-item d-flex justify-content-between">
                                 @lang('Charge'):
-                                <strong>{{showAmount($data->charge)}} {{__($general->cur_text)}}</strong>
+                                <strong>{{1}} {{__('xd')}}</strong>
                             </p>
                             <p class="list-group-item d-flex justify-content-between">
-                                @lang('Payable'): <strong> {{showAmount($data->amount + $data->charge)}} {{__($general->cur_text)}}</strong>
+                                @lang('Payable'): <strong> {{1}} {{__('xd')}}</strong>
                             </p>
                             <p class="list-group-item d-flex justify-content-between">
-                                @lang('Conversion Rate'): <strong>1 {{__($general->cur_text)}} = {{showAmount($data->rate)}}  {{__($data->baseCurrency())}}</strong>
+                                @lang('Conversion Rate'): <strong>1 {{__('xd')}} = {{1}}  {{__('xd')}}</strong>
                             </p>
                             <p class="list-group-item d-flex justify-content-between">
-                                @lang('In') {{$data->baseCurrency()}}:
-                                <strong>{{showAmount($data->final_amo)}}</strong>
+                                @lang('In') {{'xd'}}:
+                                <strong>{{1}}</strong>
                             </p>
-                            @if($data->gateway->crypto==1)
+                            @if(true)
                                 <p class="list-group-item">
                                     @lang('Conversion with')
-                                    <b> {{ __($data->method_currency) }}</b> @lang('and final value will Show on next step')
+                                    <b> {{ __('xd') }}</b> @lang('and final value will Show on next step')
                                 </p>
                             @endif
                         </ul>
 
-                        @if(1000 >$data->method_code)
+                        @if(true)
                             <a href="{{route('user.deposit.confirm')}}" class="btn btn--base d-block py-3 font-weight-bold mt-3">@lang('Pay Now')</a>
                         @else
                             <a href="{{route('user.deposit.manual.confirm')}}" class="btn btn--base d-block py-3 font-weight-bold mt-3">@lang('Pay Now')</a>

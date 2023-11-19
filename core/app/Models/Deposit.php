@@ -30,7 +30,7 @@ class Deposit extends Model
 
     public function scopeBaseCurrency()
     {
-        return $this->gateway->crypto == 1 ? 'USD' : $this->method_currency;
+        return false ? 'USD' : $this->method_currency;
     }
 
     public function scopePending()

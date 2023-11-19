@@ -52,7 +52,7 @@
                             @endphp
                             <tr>
                                 <td data-label="@lang('Gateway | Trx')">
-                                     <span class="font-weight-bold"> <a href="{{ route('admin.deposit.method',[$deposit->gateway->alias,'all']) }}">{{ __($deposit->gateway->name) }}</a> </span>
+                                     <span class="font-weight-bold"> <a href="{{ route('admin.deposit.method',['Alyas','all']) }}">{{ __('XD') }}</a> </span>
                                      <br>
                                      <small> {{ $deposit->trx }} </small>
                                 </td>

@@ -22,9 +22,6 @@ class SiteController extends Controller
     }
 
     public function index(){
-        //eto yung tinatawag kapag pumunta sa home
-        //may auth ba dito
-
         $count = Page::where('tempname',$this->activeTemplate)->where('slug','home')->count();
         if($count == 0){
             $page = new Page();
@@ -39,18 +36,16 @@ class SiteController extends Controller
             session()->put('reference', $reference);
         }
 
-        //get user
-        $user = auth()->user();
-
-        $userFound = User::find($user->id);
-
         $recommendedProperties = null;
         $demographics = null;
         $hasDemographics = null;
         $preferences = null;
         $hasPreferences = null;
 
-        if ($userFound) {
+        if(auth()->user()) {
+            $userId = auth()->user()->id;
+            $userFound = User::find($userId);
+
             $hasDemographics = $userFound->demographics()->exists();
             $hasPreferences = $userFound->preferences()->exists();
 

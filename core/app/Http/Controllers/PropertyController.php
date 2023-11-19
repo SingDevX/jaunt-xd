@@ -336,23 +336,22 @@ class PropertyController extends Controller
         ]);
 
         //SEND EMAIL DITO
-        $checkOutData = session('checkout_data');
+        // $checkOutData = session('checkout_data');
 
-        info('This is a message for the console log.');
-        info($checkOutData);
+        // info($checkOutData);
         $user = auth()->user();
         $email = $user->email;
-        info($email);
+        info($email);//send to this email
 
 
         
-        $data = ['message' => 'Xd'];
+        // $data = ['message' => 'Xd'];
 
-        Mail::to('zandergarcia552@gmail.com')->send(new BookedEmail($data));
-        if (Mail::failures()) {
-            // Handle failed recipients
-            dd(Mail::failures());
-        }
+        // Mail::to('zandergarcia552@gmail.com')->send(new BookedEmail($data));
+        // if (Mail::failures()) {
+        //     // Handle failed recipients
+        //     dd(Mail::failures());
+        // }
 
         return redirect()->route('user.deposit');
 

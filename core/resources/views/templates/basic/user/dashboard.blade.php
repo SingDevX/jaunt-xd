@@ -69,6 +69,7 @@
                                     data-booked_rooms="{{ $propertyBooking->bookedRooms }}"
                                     data-price="{{ $general->cur_sym }}{{ showAmount($propertyBooking->total_price) }}"
                                     data-image="{{ getImage(imagePath()['property']['path'].'/'. $propertyBooking->property->image,imagePath()['property']['size'])}}"
+                                    data-booking-id="{{ $propertyBooking->id }}"
                                 ><i class="las la-eye"></i></button>
                             </td>
                         </tr>
@@ -132,6 +133,7 @@
                    <img src="" class="showImage">
                 </div>
                 <div class="modal-footer">
+                    <button type="button" class="btn btn--base" id="cancelButton">@lang('Cancel')</button>
                     <button type="button" class="btn btn--dark" data-bs-dismiss="modal">@lang('Close')</button>
                 </div>
         </div>
@@ -146,6 +148,14 @@
         $('.showProperty').click(function () {
             var modal = $('#propertyModal');
             var data = $(this).data();
+
+            $('#propertyModal').on('click', '#cancelButton', function () {
+                var bookingId = data.bookingId;
+                console.log(bookingId)
+                var isConfirmed = confirm('Are you sure you want to cancel this booking?');
+                console.log(isConfirmed)
+            });
+            
             var roomList = '';
             var action = `{{ route('user.review.store') }}`;
             modal.find('.modal-title').text(data.name);

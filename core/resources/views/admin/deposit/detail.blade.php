@@ -6,7 +6,7 @@
                 <div class="card-body">
                     <h5 class="mb-20 text-muted">@lang('Payment Via') {{ __(@$deposit->gateway->name) }}</h5>
                     <div class="p-3 bg--white">
-                        <img src="{{ $deposit->gatewayCurrency()->methodImage() }}" alt="@lang('Profile Image')" class="b-radius--10 deposit-imgView">
+                        <img src="{{ 'https://i.seadn.io/gae/2hDpuTi-0AMKvoZJGd-yKWvK4tKdQr_kLIpB_qSeMau2TNGCNidAosMEvrEXFO9G6tmlFlPQplpwiqirgrIPWnCKMvElaYgI-HiVvXc?auto=format&dpr=1&w=1000' }}" alt="@lang('Profile Image')" class="b-radius--10 deposit-imgView">
                     </div>
                     <ul class="list-group">
                         <li class="list-group-item d-flex justify-content-between align-items-center">
