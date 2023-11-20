@@ -18,7 +18,8 @@ class DemographicsController extends Controller
         $user = User::find(auth()->user()->id);
     
         $user->demographics()->create($validatedData);
-
-        return redirect()->route('home')->with('demographics-success', 'Additional information saved successfully!');;
+        
+        $notify[] = ['success', 'Additional information saved.'];
+        return redirect()->route('home')->withNotify($notify);
     }
 }

@@ -357,6 +357,25 @@ class PropertyController extends Controller
 
     }
 
+    public function cancelBooking(Request $request){
+        $bookingId = $request->input('bookingId');
+        $bookedProperty = BookedProperty::findOrFail($bookingId);
+        if ($bookedProperty->user_id !== auth()->id()) {
+            abort(403, 'Unauthorized');
+        }
+        $bookedRoom = BookedRoom::where('booked_property_id', $bookingId)->first();
+
+        if ($bookedProperty) {
+            $bookedProperty->delete();
+        }
+        if ($bookedRoom) {
+            $bookedRoom->delete();
+        }
+
+        $notify[] = ['success', 'Booking canceled.'];
+        return redirect()->route('user.home')->withNotify($notify);
+    }
+
     public function reviewLoad(Request $request)
     {
         $page = $request->page;

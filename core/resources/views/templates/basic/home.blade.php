@@ -99,18 +99,6 @@
     @endif
 @endif
 
-@if(session('demographics-success'))
-    <div class="alert alert-success">
-        {{ session('demographics-success') }}
-    </div>
-@endif
-
-@if(session('preferences-success'))
-    <div class="alert alert-success">
-        {{ session('preferences-success') }}
-    </div>
-@endif
-
 @if ($recommendedProperties)
     <div class="best-trip-slider">
         @foreach ($recommendedProperties as $property)

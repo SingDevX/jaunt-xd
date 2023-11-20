@@ -139,6 +139,30 @@
         </div>
     </div>
 </div>
+
+<div id="confirmationModal" class="modal fade" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">@lang('Confirmation')</h5>
+                <button type="button" class="btn btn-sm btn--danger" data-bs-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p>@lang('Are you sure you want to cancel?')</p>
+            </div>
+            <form id="cancelForm" method="GET" action="{{ route('user.cancel.booking', ['bookingId' => ':bookingId']) }}">
+                @csrf
+                <input type="hidden" name="bookingId" id="bookingId">
+            </form>
+            <div class="modal-footer">
+                <button type="button" class="btn btn--base" id="confirmCancelButton">@lang('Yes, Cancel')</button>
+                <button type="button" class="btn btn--dark" data-bs-dismiss="modal">@lang('No')</button>
+            </div>
+        </div>
+    </div>
+</div>
 @endpush
 
 @push('script')
@@ -150,10 +174,12 @@
             var data = $(this).data();
 
             $('#propertyModal').on('click', '#cancelButton', function () {
-                var bookingId = data.bookingId;
-                console.log(bookingId)
-                var isConfirmed = confirm('Are you sure you want to cancel this booking?');
-                console.log(isConfirmed)
+                $('#confirmationModal').modal('show');
+            });
+            $('#confirmationModal').on('click', '#confirmCancelButton', function () {
+                $('#bookingId').val(data.bookingId);
+                $('#cancelForm').submit();
+                $('#confirmationModal').modal('hide');
             });
             
             var roomList = '';

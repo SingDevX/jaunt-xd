@@ -36,6 +36,7 @@ class PreferencesController extends Controller
 
         $user->preferences()->create($preferencesData);
 
-        return redirect()->route('home')->with('preferences-success', 'Preferences saved successfully!');
+        $notify[] = ['success', 'Preferences saved.'];
+        return redirect()->route('home')->withNotify($notify);
     }
 }
