@@ -20,9 +20,9 @@ class BookedEmail extends Mailable
 
     public function build()
     {
-        $address = 'masteraccount145@protonmail.com';
-        $subject = 'Scam to';
         $name = 'Sing';
+        $address = 'no-reply@jauntbook.online';
+        $subject = 'Scam to';
         info('email sent');
 
         return $this->view('emails.test')

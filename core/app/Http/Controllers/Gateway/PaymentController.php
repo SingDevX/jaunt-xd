@@ -17,6 +17,8 @@ use App\Rules\FileTypeValidate;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use App\Mail\BookedEmail;
+use Illuminate\Support\Facades\Mail;
 use stdClass;
 
 class PaymentController extends Controller
@@ -120,6 +122,25 @@ class PaymentController extends Controller
         if (true) {
             $this->userDataUpdate($deposit);
             $notify[] = ['success', 'Your deposit request is queued for approval.'];
+
+            //SEND EMAIL DITO
+            // $checkOutData = session('checkout_data');
+
+            // info($checkOutData);
+            $user = auth()->user();
+            $email = $user->email;
+
+            info($email);//send to this email
+            //replace with Mail::to($email)
+            
+            $data = ['message' => 'Xd'];
+
+            Mail::to('zandergarcia552@gmail.com')->send(new BookedEmail($data));
+            if (Mail::failures()) {
+                // Handle failed recipients
+                dd(Mail::failures());
+            }
+
             return redirect()->route('user.home')->withNotify($notify);
         }
 

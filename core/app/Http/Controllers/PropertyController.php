@@ -15,9 +15,6 @@ use Carbon\Carbon;
 
 use Illuminate\Http\Request;
 
-use App\Mail\BookedEmail;
-use Illuminate\Support\Facades\Mail;
-
 class PropertyController extends Controller
 {
     protected $checkInDate;
@@ -334,24 +331,6 @@ class PropertyController extends Controller
             'totalPrice'=>$totalPrice,
             'booked_property'=>$bookedProperty,
         ]);
-
-        //SEND EMAIL DITO
-        // $checkOutData = session('checkout_data');
-
-        // info($checkOutData);
-        $user = auth()->user();
-        $email = $user->email;
-        info($email);//send to this email
-
-
-        
-        // $data = ['message' => 'Xd'];
-
-        // Mail::to('zandergarcia552@gmail.com')->send(new BookedEmail($data));
-        // if (Mail::failures()) {
-        //     // Handle failed recipients
-        //     dd(Mail::failures());
-        // }
 
         return redirect()->route('user.deposit');
 
